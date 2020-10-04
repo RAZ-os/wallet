@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"testing"
 	"github.com/google/uuid"
-	"wallet/pkg/types"
+	"github.com/RAZ-os/wallet/pkg/types"
 )
 
 type testService struct{
