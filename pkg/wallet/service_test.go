@@ -22,7 +22,7 @@ type testAccount struct {
 }
 
 var defaultTestAccount = testAccount {
-	phone: "+992000000001",
+	phone: "+992901000876",
 	balance: 10_000_00,
 	payments: []struct {
 		amount types.Money
