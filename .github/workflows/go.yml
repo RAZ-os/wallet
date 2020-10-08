@@ -1,35 +1,3 @@
-Skip to content
-Search or jump to…
-
-Pull requests
-Issues
-Marketplace
-Explore
- 
-@RAZ-os 
-RAZ-os
-/
-wallet
-1
-00
-Code
-Issues
-Pull requests
-Actions
-Projects
-Wiki
-Security
-Insights
-Settings
-Поиск по ID
-master @RAZ-os  90308b5
-Go
-on: push
- Build
-Go
-This run
-Workflow file
-.github/workflows/go.yml
 name: Go
 
 on:
