@@ -10,8 +10,8 @@ func main(){
 
 	svc := &wallet.Service{}
 	path := "files/accounts.txt"
-	err := svc.ExportToFile(path)
-	err = svc.ImportFromFile(path)
+	//err := svc.ExportToFile(path)
+	err := svc.ImportFromFile(path)
 
 	account, err1 := svc.RegisterAccount("+992901000876")
 
