@@ -1,22 +1,31 @@
 package main
 
 import (
-	"github.com/RAZ-os/wallet/pkg/wallet"
 	"fmt"
+	//"strconv"
+	"github.com/RAZ-os/wallet/pkg/wallet"
 ) 
 
 func main(){
 
 	svc := &wallet.Service{}
+	path := "files/accounts.txt"
+	err := svc.ExportToFile(path)
+	err = svc.ImportFromFile(path)
 
-	account, err := svc.RegisterAccount("+992000000002")
+	account, err1 := svc.RegisterAccount("+992901000876")
+
 	
 	if err != nil{
 		fmt.Println(err)
 		return
 	}
+	if err1 != nil{
+		fmt.Println(err1)
+		return
+	}
 
-	payment, err := svc.Pay(account.ID, 20, "auto")
+/*	payment, err := svc.Pay(account.ID, 20, "auto")
 	
 	if err != nil {
 		fmt.Println(err)
@@ -29,8 +38,9 @@ func main(){
 		fmt.Println(err)
 		return
 	}
-	
-	fmt.Println(account.Balance)
-	fmt.Println(payment)
-	fmt.Println(favorite)
+*/	
+	fmt.Println(*account)
+	//fmt.Println(strconv.FormatInt(66,2))
+	//fmt.Println(payment)
+	//fmt.Println(favorite)
 }

@@ -4,6 +4,9 @@ package wallet
 	"errors"
 	"github.com/RAZ-os/wallet/pkg/types"
 	"github.com/google/uuid"
+	"os"
+	"strconv"
+	"strings"
 )
 
 var ErrPhoneRegistered = errors.New("phone already registered")
@@ -33,7 +36,7 @@ func (s *Service) RegisterAccount(phone types.Phone) (*types.Account, error)  {
 		Balance: 0,
 	}
 	s.accounts = append(s.accounts, account)
-
+	
 	return account, nil
 }
 
@@ -206,18 +209,79 @@ func (s *Service) PayFromFavorite(favoriteID string) (*types.Payment, error) {
 
 	return payment, nil
 }
+///////////////////////////////////////////////////////////
+func (s *Service) ExportToFile(path string) error{
+	
+	file, err := os.Create(path)
+	if err != nil {
+		return err
+	}
 
-/*
-func (s *Service) FindAccountById(accountID int64) (*types.Account, error){
-	var account *types.Account
-	for _, acnt := range s.accounts {
-		if acnt.ID != accountID {
-			return nil, ErrAccountNotFound
+	content := ""
+
+	for index, account := range s.accounts {
+		content += strconv.FormatInt(int64(account.ID),10) + ";" + string(account.Phone) + ";" + strconv.FormatInt(int64(account.Balance),10)
+		if(index != len(s.accounts)-1){
+			content += "|"
 		}
-		account = acnt
-	if account == nil {
-		return nil, ErrAccountNotFound
 	}
+
+	_, err = file.Write([]byte(content))
+	if err != nil{
+		return err
 	}
-		return account, nil
-}*/
+
+	//defer func(){
+		err := file.Close()
+		if err != nil{
+			return err
+		}
+	//}()
+
+	return nil
+}
+//////////////////////////////////////////////
+func (s *Service) ImportFromFile(path string) error {
+	file, err := os.Open(path)
+	if err != nil {
+		return err
+	}
+
+	buf := make([]byte, 4096)
+	read, err := file.Read(buf)
+	if err != nil {
+		return err
+	}
+
+	content := string(buf[:read])
+	
+	accounts := strings.Split(content, "|")
+
+	for _, account := range accounts {
+		accountConvArr := strings.Split(account, ";")
+		
+		importedAccount, err := s.RegisterAccount(types.Phone(accountConvArr[1])) //account phone
+		if(err != nil){
+			return err
+		}
+
+		balance, err := strconv.ParseInt(accountConvArr[2], 10, 64) //account balance
+		if(err != nil){
+			return err
+		}
+
+		if(balance>0){
+			err = s.Deposit(importedAccount.ID, types.Money(balance))
+			if(err != nil){
+				return err
+			}
+		}
+	}
+	
+	err = file.Close()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

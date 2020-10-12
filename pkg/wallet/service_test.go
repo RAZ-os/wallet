@@ -6,6 +6,8 @@ import (
 	"testing"
 	"github.com/google/uuid"
 	"github.com/RAZ-os/wallet/pkg/types"
+	//"os"
+	//"log"
 )
 
 type testService struct{
