@@ -232,7 +232,7 @@ func (s *Service) ExportToFile(path string) error{
 	}
 
 	//defer func(){
-		err := file.Close()
+		err = file.Close()
 		if err != nil{
 			return err
 		}
