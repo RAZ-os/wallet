@@ -8,13 +8,14 @@ import (
 
 func main(){
 
-	svc := &wallet.Service{}
+	 svc := &wallet.Service{}
 	account, err := svc.RegisterAccount("+992901000875")
 	payment, err := svc.Pay(account.ID, 20, "auto")
 	favorite, err := svc.FavoritePayment(payment.ID, "My Favorite Payment")
 	//path := "files/accounts.txt"
 	dir := "files"
 	err = svc.Export(dir)
+	err = svc.Import(dir)
 	//err = svc.ExportToFile(path)
 	//err = svc.ImportFromFile(path)
 	
@@ -39,7 +40,7 @@ func main(){
 	}
 	*/
 	fmt.Println(*account)
-	//fmt.Println(strconv.FormatInt(66,2))
 	fmt.Println(payment)
 	fmt.Println(favorite)
+	fmt.Println(err)
 }

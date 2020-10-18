@@ -1,7 +1,9 @@
 package wallet
 
 import (
+	"bufio"
 	"errors"
+	"io"
 	"io/ioutil"
 	"log"
 	"os"
@@ -297,17 +299,40 @@ func (s *Service) Export(dir string) error {
 
 	if AccLen > 0 {
 		DumpDir := dir + "/accounts.dump"
-		/* damp, err := os.Create(DumpDir)
-		 if err != nil {
-			 return err
-		 }*/
+		
+			// // Если файл уже существует то просто добавляем запись
+	if _, err := os.Stat(dir+"/accounts.dump"); err == nil {
+
+		file, err := os.OpenFile(dir+"/accounts.dump", os.O_APPEND|os.O_WRONLY, 0600)
+    if err != nil {
+        return err
+    }
+    defer func() {
+	  if cerr:=	file.Close(); cerr != nil {
+     log.Print(cerr)
+	  }
+	}()
+
+	content := ""
+
+	for index, account := range s.accounts {
+		content += strconv.FormatInt(int64(account.ID), 10) + ";" + string(account.Phone) + ";" + strconv.FormatInt(int64(account.Balance), 10)
+		if index != len(s.accounts)-1 {
+			content += "\n"
+		}
+	}
+
+    if _, err = file.WriteString(content+"\n"); err != nil {
+        log.Print(err)
+    }
+	   } else {
 
 		content := ""
 
 		for index, account := range s.accounts {
 			content += strconv.FormatInt(int64(account.ID), 10) + ";" + string(account.Phone) + ";" + strconv.FormatInt(int64(account.Balance), 10)
 			if index != len(s.accounts)-1 {
-				content += "|"
+				content += "\n"
 			}
 		}
 
@@ -316,43 +341,93 @@ func (s *Service) Export(dir string) error {
 			log.Print(err)
 			return err
 		}
+	  }
+    }
 
-	}
+	if FavLen > 0 { //// Данные есть
 
-	if FavLen > 0 {
 		DumpDir := dir + "/favorites.dump"
+
+		if _, err := os.Stat(DumpDir); err == nil { /// Файл существует
+	   
+			file, err := os.OpenFile(DumpDir, os.O_APPEND|os.O_WRONLY, 0600)
+			if err != nil {
+				return err
+			}
+			defer func() {
+			  if cerr:=	file.Close(); cerr != nil {
+			 log.Print(cerr)
+			  }
+			}()
+		
+			content := ""
+		
+			for index, favorite := range s.favorites {
+				content += strconv.FormatInt(int64(favorite.AccountID), 10) + ";" + strconv.FormatInt(int64(favorite.Amount), 10) + ";" + string(favorite.Category) + ";" + string(favorite.ID) + ";" + string(favorite.Name)
+				if index != len(s.accounts)-1 {
+					content += "\n"
+				}
+			}
+		
+			if _, err = file.WriteString(content+"\n"); err != nil {
+				log.Print(err)
+			}
+
+		} else {
 
 		content := ""
 
 		for index, favorite := range s.favorites {
 			content += strconv.FormatInt(int64(favorite.AccountID), 10) + ";" + strconv.FormatInt(int64(favorite.Amount), 10) + ";" + string(favorite.Category) + ";" + string(favorite.ID) + ";" + string(favorite.Name)
 			if index != len(s.accounts)-1 {
-				content += "|"
+				content += "\n"
 			}
 		}
-
+	  
 		err := ioutil.WriteFile(DumpDir, []byte(content), 0644)
 		if err != nil {
 			log.Print(err)
 			return err
-		}
-
-	/*	defer func() {
-			if cerr := DumpDir.Close(); cerr != nil {
-				log.Print(cerr)
-			}
-		}()*/
+	  }
 	}
+}
 
-	if PayLen > 0 {
+    if PayLen > 0 {
+
 		DumpDir := dir + "/payments.dump"
+
+		if _, err := os.Stat(DumpDir); err == nil { /// Файл существует
+	   
+			file, err := os.OpenFile(DumpDir, os.O_APPEND|os.O_WRONLY, 0600)
+			if err != nil {
+				return err
+			}
+			defer func() {
+			  if cerr:=	file.Close(); cerr != nil {
+			 log.Print(cerr)
+			  }
+			}()
+		
+			content := ""
+			for index, payment := range s.payments {
+				content += strconv.FormatInt(int64(payment.AccountID), 10) + ";" + strconv.FormatInt(int64(payment.Amount), 10) + ";" + string(payment.Category) + ";" + string(payment.ID) + ";" + string(payment.Status)
+				if index != len(s.accounts)-1 {
+					content += "\n"
+				}
+			}
+		
+			if _, err = file.WriteString(content+"\n"); err != nil {
+				log.Print(err)
+			}
+
+		} else {
 
 		content := ""
 
 		for index, payment := range s.payments {
 			content += strconv.FormatInt(int64(payment.AccountID), 10) + ";" + strconv.FormatInt(int64(payment.Amount), 10) + ";" + string(payment.Category) + ";" + string(payment.ID) + ";" + string(payment.Status)
 			if index != len(s.accounts)-1 {
-				content += "|"
+				content += "\n"
 			}
 		}
 
@@ -361,13 +436,91 @@ func (s *Service) Export(dir string) error {
 			log.Print(err)
 			return err
 		}
-
-	/*	defer func() {
-			if cerr := DumpDir.Close(); cerr != nil {
-				log.Print(cerr)
-			}
-		}()*/
+	  }
 	}
 
    return nil
+}
+
+func(s *Service) Import(dir string) error{
+
+	if _, err := os.Stat(dir+"/accounts.dump"); err == nil { //// Accounts start
+		file, err := os.Open(dir+"/accounts.dump")
+		if err != nil {
+			log.Print(err)
+		}
+		defer func() {
+			if cerr := file.Close(); cerr != nil {
+				log.Print(cerr)
+			}
+		}()
+		reader := bufio.NewReader(file)
+	for{
+	   line, err := reader.ReadString('\n')
+	   if err == io.EOF{
+		   log.Print(line)
+		   break
+	   }
+		
+	if err != nil{
+		log.Print(err)
+		break
+	}
+	log.Print(line)
+}
+ } // //// Accounts end 
+
+if _, err := os.Stat(dir+"/payments.dump"); err == nil {
+	file, err := os.Open(dir+"/payments.dump")
+	if err != nil {
+		log.Print(err)
+	}
+	defer func() {
+		if cerr := file.Close(); cerr != nil {
+			log.Print(cerr)
+		}
+	}()
+	reader := bufio.NewReader(file)
+for{
+   line, err := reader.ReadString('\n')
+   if err == io.EOF{
+	   log.Print(line)
+	   break
+   }
+	
+if err != nil{
+	log.Print(err)
+	break
+}
+log.Print(line)
+}
+
+}
+if _, err := os.Stat(dir+"/favorites.dump"); err == nil {
+	file, err := os.Open(dir+"/favorites.dump")
+	if err != nil {
+		log.Print(err)
+	}
+	defer func() {
+		if cerr := file.Close(); cerr != nil {
+			log.Print(cerr)
+		}
+	}()
+	reader := bufio.NewReader(file)
+for{
+   line, err := reader.ReadString('\n')
+   if err == io.EOF{
+	   log.Print(line)
+	   break
+   }
+	
+if err != nil{
+	log.Print(err)
+	break
+}
+log.Print(line)
+}
+
+}
+return nil
 }
