@@ -10,6 +10,7 @@ import (
 	"strconv"
 	"strings"
 	"github.com/RAZ-os/wallet/pkg/types"
+	//"wallet/pkg/types"
 	"github.com/google/uuid"
 )
 
@@ -112,7 +113,7 @@ func (s *Service) FindPaymentByID(paymentID string) (*types.Payment, error) {
 	for _, payment := range s.payments {
 		if payment.ID == paymentID {
 			return payment, nil
-			break
+			//break
 		}
 	}
 
@@ -186,7 +187,7 @@ func (s *Service) FindFavoritePaymentByID(favorityID string) (*types.Favorite, e
 	for _, favorite := range s.favorites {
 		if favorite.ID == favorityID {
 			return favorite, nil
-			break
+			//break
 		}
 	}
 
@@ -441,7 +442,188 @@ func (s *Service) Export(dir string) error {
    return nil
 }
 
-func(s *Service) Import(dir string) error{
+func (s *Service) Import(dir string) error {
+	//For accounts
+	accountFile := "/accounts.dump"
+	src, err := os.Open(dir + accountFile)
+	if err != nil {
+		log.Print("There is no %w file", accountFile)
+	} else {
+		defer func() {
+			if cerr := src.Close(); cerr != nil {
+				log.Print(cerr)
+			}
+		}()
+
+		reader := bufio.NewReader(src)
+		for {
+			line, err := reader.ReadString('\n')
+			if err == io.EOF {
+				log.Print(line)
+				break
+			}
+			if err != nil {
+				log.Print(err)
+				return err
+			}
+
+			item := strings.Split(line, ";")
+
+			id, err := strconv.ParseInt(item[0], 10, 64)
+			if err != nil {
+				log.Print(err)
+				return err
+			}
+
+			phone := item[1]
+
+			balance, err := strconv.ParseInt(item[2], 10, 64)
+			if err != nil {
+				log.Print(err)
+				return err
+			}
+
+			findAccount, _ := s.FindAccountByID(id)
+			if findAccount != nil {
+				findAccount.Phone = types.Phone(phone)
+				findAccount.Balance = types.Money(balance)
+			} else {
+				s.nextAccountID = id
+				newAcc := &types.Account{
+					ID:      s.nextAccountID,
+					Phone:   types.Phone(phone),
+					Balance: types.Money(balance),
+				}
+
+				s.accounts = append(s.accounts, newAcc)
+			}
+		}
+		log.Print("Imported")
+
+	}
+
+	// For Payments
+	paymentsFile := "/payments.dump"
+	paySrc, err := os.Open(dir + paymentsFile)
+	if err != nil {
+		log.Print("There is no %w file", paymentsFile)
+	} else {
+		defer func() {
+			if cerr := paySrc.Close(); cerr != nil {
+				log.Print(cerr)
+			}
+		}()
+
+		payReader := bufio.NewReader(paySrc)
+		for {
+			payLine, err := payReader.ReadString('\n')
+			if err == io.EOF {
+				log.Print(payLine)
+				break
+			}
+			if err != nil {
+				log.Print(err)
+				return err
+			}
+
+			item := strings.Split(payLine, ";")
+
+			id := string(item[0])
+			accID, err := strconv.ParseInt(item[1], 10, 64)
+			if err != nil {
+				log.Print(err)
+				return err
+			}
+
+			amount, err := strconv.ParseInt(item[2], 10, 64)
+			if err != nil {
+				log.Print(err)
+				return err
+			}
+
+			category := item[3]
+
+			status := item[4]
+
+			findPay, _ := s.FindPaymentByID(id)
+			if findPay != nil {
+				findPay.AccountID = accID
+				findPay.Amount = types.Money(amount)
+				findPay.Category = types.PaymentCategory(category)
+				findPay.Status = types.PaymentStatus(status)
+			} else {
+				newPay := &types.Payment{
+					ID:        id,
+					AccountID: accID,
+					Amount:    types.Money(amount),
+					Category:  types.PaymentCategory(category),
+					Status:    types.PaymentStatus(status),
+				}
+
+				s.payments = append(s.payments, newPay)
+			}
+		}
+		log.Print("Imported")
+	}
+
+	//For favorites
+	favoritesFile := "/favorites.dump"
+	favFile, err := os.Open(dir + favoritesFile)
+	if err != nil {
+		log.Print("There is no such %w a file", favoritesFile)
+	} else {
+		reader := bufio.NewReader(favFile)
+		for {
+			favLine, err := reader.ReadString('\n')
+			if err == io.EOF {
+				log.Print(favLine)
+				break
+			}
+			if err != nil {
+				log.Print(err)
+				return err
+			}
+
+			item := strings.Split(favLine, ";")
+
+			id := item[0]
+			accID, err := strconv.ParseInt(item[1], 10, 64)
+			if err != nil {
+				log.Print(err)
+				return err
+			}
+			name := item[2]
+			amount, err := strconv.ParseInt(item[3], 10, 64)
+			if err != nil {
+				log.Print(err)
+				return err
+			}
+			category := item[4]
+
+			findFav, _ := s.FindFavoritePaymentByID(id)
+			if findFav != nil {
+				findFav.AccountID = accID
+				findFav.Amount = types.Money(amount)
+				findFav.Name = name
+				findFav.Category = types.PaymentCategory(category)
+			} else {
+				newFav := &types.Favorite{
+					ID:        id,
+					AccountID: accID,
+					Name:      name,
+					Amount:    types.Money(amount),
+					Category:  types.PaymentCategory(category),
+				}
+				s.favorites = append(s.favorites, newFav)
+			}
+		}
+		log.Print("Imported")
+	}
+
+	return nil
+}
+
+/*func(s *Service) Import(dir string) error{
 
 	if _, err := os.Stat(dir+"/accounts.dump"); err == nil { //// Accounts start
 		file, err := os.Open(dir+"/accounts.dump")
@@ -522,4 +704,4 @@ log.Print(line)
 
 }
 return nil
-}
+}*/
