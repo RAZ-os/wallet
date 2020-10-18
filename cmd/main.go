@@ -10,7 +10,7 @@ import (
 func main(){
 
 	 svc := &wallet.Service{}
-	account, err := svc.RegisterAccount("+992901000875")
+	account, err := svc.RegisterAccount("+992901000876")
 	payment, err := svc.Pay(account.ID, 20, "auto")
 	favorite, err := svc.FavoritePayment(payment.ID, "My Favorite Payment")
 	//path := "files/accounts.txt"

@@ -4,7 +4,7 @@ import (
 	"bufio"
 	"errors"
 	"io"
-	"io/ioutil"
+	//"io/ioutil"
 	"log"
 	"os"
 	"strconv"
@@ -298,12 +298,10 @@ func (s *Service) Export(dir string) error {
 	AccLen := len(s.accounts)
 
 	if AccLen > 0 {
+
 		DumpDir := dir + "/accounts.dump"
 		
-			// // Если файл уже существует то просто добавляем запись
-	if _, err := os.Stat(dir+"/accounts.dump"); err == nil {
-
-		file, err := os.OpenFile(dir+"/accounts.dump", os.O_APPEND|os.O_WRONLY, 0600)
+		file, err := os.Create(DumpDir)
     if err != nil {
         return err
     }
@@ -313,44 +311,20 @@ func (s *Service) Export(dir string) error {
 	  }
 	}()
 
-	content := ""
-
-	for index, account := range s.accounts {
-		content += strconv.FormatInt(int64(account.ID), 10) + ";" + string(account.Phone) + ";" + strconv.FormatInt(int64(account.Balance), 10)
-		if index != len(s.accounts)-1 {
-			content += "\n"
-		}
-	}
-
-    if _, err = file.WriteString(content+"\n"); err != nil {
-        log.Print(err)
-    }
-	   } else {
-
-		content := ""
-
-		for index, account := range s.accounts {
-			content += strconv.FormatInt(int64(account.ID), 10) + ";" + string(account.Phone) + ";" + strconv.FormatInt(int64(account.Balance), 10)
-			if index != len(s.accounts)-1 {
-				content += "\n"
-			}
-		}
-
-		err := ioutil.WriteFile(DumpDir, []byte(content), 0644)
+	for _, account := range s.accounts {
+		txtitemue := []byte(strconv.FormatInt(int64(account.ID), 10) + string(";") + string(account.Phone) + string(";") + strconv.FormatInt(int64(account.Balance), 10) + string(";") + string('\n'))
+		_, err = file.Write(txtitemue)
 		if err != nil {
-			log.Print(err)
 			return err
 		}
-	  }
-    }
+	}
+}
 
 	if FavLen > 0 { //// Данные есть
 
 		DumpDir := dir + "/favorites.dump"
 
-		if _, err := os.Stat(DumpDir); err == nil { /// Файл существует
-	   
-			file, err := os.OpenFile(DumpDir, os.O_APPEND|os.O_WRONLY, 0600)
+			file, err := os.Create(DumpDir)
 			if err != nil {
 				return err
 			}
@@ -359,46 +333,22 @@ func (s *Service) Export(dir string) error {
 			 log.Print(cerr)
 			  }
 			}()
-		
-			content := ""
-		
-			for index, favorite := range s.favorites {
-				content += strconv.FormatInt(int64(favorite.AccountID), 10) + ";" + strconv.FormatInt(int64(favorite.Amount), 10) + ";" + string(favorite.Category) + ";" + string(favorite.ID) + ";" + string(favorite.Name)
-				if index != len(s.accounts)-1 {
-					content += "\n"
+
+			for _, fav := range s.favorites {
+				text := []byte(fav.ID + ";" + strconv.FormatInt(int64(fav.AccountID), 10) + ";" + fav.Name + ";" + strconv.FormatInt(int64(fav.Amount), 10) + ";" + string(fav.Category) + string('\n'))
+				_, err := file.Write(text)
+				if err != nil {
+					log.Print(err)
+					return err
 				}
 			}
-		
-			if _, err = file.WriteString(content+"\n"); err != nil {
-				log.Print(err)
-			}
-
-		} else {
-
-		content := ""
-
-		for index, favorite := range s.favorites {
-			content += strconv.FormatInt(int64(favorite.AccountID), 10) + ";" + strconv.FormatInt(int64(favorite.Amount), 10) + ";" + string(favorite.Category) + ";" + string(favorite.ID) + ";" + string(favorite.Name)
-			if index != len(s.accounts)-1 {
-				content += "\n"
-			}
 		}
-	  
-		err := ioutil.WriteFile(DumpDir, []byte(content), 0644)
-		if err != nil {
-			log.Print(err)
-			return err
-	  }
-	}
-}
 
     if PayLen > 0 {
 
 		DumpDir := dir + "/payments.dump"
-
-		if _, err := os.Stat(DumpDir); err == nil { /// Файл существует
 	   
-			file, err := os.OpenFile(DumpDir, os.O_APPEND|os.O_WRONLY, 0600)
+			file, err := os.Create(DumpDir)
 			if err != nil {
 				return err
 			}
@@ -408,35 +358,13 @@ func (s *Service) Export(dir string) error {
 			  }
 			}()
 		
-			content := ""
-			for index, payment := range s.payments {
-				content += strconv.FormatInt(int64(payment.AccountID), 10) + ";" + strconv.FormatInt(int64(payment.Amount), 10) + ";" + string(payment.Category) + ";" + string(payment.ID) + ";" + string(payment.Status)
-				if index != len(s.accounts)-1 {
-					content += "\n"
+			for _, payment := range s.payments {
+				txtitemue := []byte(string(payment.ID) + string(";") + strconv.FormatInt(int64(payment.AccountID), 10) + string(";") + strconv.FormatInt(int64(payment.Amount), 10) + string(";") + string(payment.Category) + string(";") + string(payment.Status) + string(";") + string('\n'))
+				_, err = file.Write(txtitemue)
+				if err != nil {
+					return err
 				}
 			}
-		
-			if _, err = file.WriteString(content+"\n"); err != nil {
-				log.Print(err)
-			}
-
-		} else {
-
-		content := ""
-
-		for index, payment := range s.payments {
-			content += strconv.FormatInt(int64(payment.AccountID), 10) + ";" + strconv.FormatInt(int64(payment.Amount), 10) + ";" + string(payment.Category) + ";" + string(payment.ID) + ";" + string(payment.Status)
-			if index != len(s.accounts)-1 {
-				content += "\n"
-			}
-		}
-
-		err := ioutil.WriteFile(DumpDir, []byte(content), 0644)
-		if err != nil {
-			log.Print(err)
-			return err
-		}
-	  }
 	}
 
    return nil
