@@ -313,7 +313,6 @@ func TestService_Repeat_success(t *testing.T) {
 	}
 }
 
-
 func TestService_PayFromFavorite_success(t *testing.T) {
 	//создаём сервис
 	s := newTestService()
