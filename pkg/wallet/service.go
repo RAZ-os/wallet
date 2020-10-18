@@ -9,7 +9,6 @@ import (
 	"os"
 	"strconv"
 	"strings"
-
 	"github.com/RAZ-os/wallet/pkg/types"
 	"github.com/google/uuid"
 )
