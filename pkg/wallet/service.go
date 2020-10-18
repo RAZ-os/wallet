@@ -8,7 +8,7 @@ import (
 	"log"
 	"os"
 	"strconv"
-	//"strings"
+	"strings"
 
 	"github.com/RAZ-os/wallet/pkg/types"
 	"github.com/google/uuid"
