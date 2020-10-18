@@ -9,38 +9,37 @@ import (
 func main(){
 
 	svc := &wallet.Service{}
-	path := "files/accounts.txt"
-	//err := svc.ExportToFile(path)
-	err := svc.ImportFromFile(path)
-
-	account, err1 := svc.RegisterAccount("+992901000876")
-
+	account, err := svc.RegisterAccount("+992901000875")
+	payment, err := svc.Pay(account.ID, 20, "auto")
+	favorite, err := svc.FavoritePayment(payment.ID, "My Favorite Payment")
+	//path := "files/accounts.txt"
+	dir := "files"
+	err = svc.Export(dir)
+	//err = svc.ExportToFile(path)
+	//err = svc.ImportFromFile(path)
 	
 	if err != nil{
 		fmt.Println(err)
 		return
 	}
-	if err1 != nil{
-		fmt.Println(err1)
+
+/*	if err_a != nil{
+		fmt.Println(err_a)
 		return
 	}
 
-/*	payment, err := svc.Pay(account.ID, 20, "auto")
-	
-	if err != nil {
-		fmt.Println(err)
+	if err_p != nil {
+		fmt.Println(err_p)
 		return
 	}
 
-	favorite, err := svc.FavoritePayment(payment.ID, "My Favorite Payment")
-
-	if err != nil {
-		fmt.Println(err)
+	if err_f != nil {
+		fmt.Println(err_f)
 		return
 	}
-*/	
+	*/
 	fmt.Println(*account)
 	//fmt.Println(strconv.FormatInt(66,2))
-	//fmt.Println(payment)
-	//fmt.Println(favorite)
+	fmt.Println(payment)
+	fmt.Println(favorite)
 }
