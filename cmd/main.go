@@ -23,7 +23,7 @@ func main(){
 	payment, err := svc.Pay(1, 5_000_000, "fun")
 	payment, err = svc.Pay(1, 10_000_000, "auto")
 	//favorite, err := svc.FavoritePayment(payment.ID, "My Favorite Payment")
-	sum := svc.SumPayments(4)
+	sum := svc.SumPayments(1)
 	//path := "files/accounts.txt"
 	dir := "files"
 	err = svc.Export(dir)
