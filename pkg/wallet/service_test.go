@@ -343,3 +343,22 @@ func TestService_PayFromFavorite_success(t *testing.T) {
 		return
 	}
 }
+func TestService_SumPayments_success(t *testing.T) {
+	want := types.Money(3_000_00)
+	//создаём сервис
+	srv := newTestService()
+
+	//регистриуем там пользователя
+	_, _, _, err := srv.addAccount(defaultTestAccount)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	got := srv.SumPayments(5)
+
+	if want != got {
+		t.Errorf("SumPayments(): want: %v got: %v", want, got)
+		return
+	}
+}
