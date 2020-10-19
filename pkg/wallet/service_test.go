@@ -25,12 +25,12 @@ type testAccount struct {
 
 var defaultTestAccount = testAccount {
 	phone: "+992901000876",
-	balance: 1_000_00,
+	balance: 2_000_00,
 	payments: []struct {
 		amount types.Money
 		category types.PaymentCategory
 	}{
-		{amount: 1_000_00, category: "auto"},
+		{amount: 2_000_00, category: "auto"},
 	},
 }
 
