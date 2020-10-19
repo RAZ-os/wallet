@@ -20,8 +20,8 @@ func main(){
 
 	 svc := &wallet.Service{}
 	account, err := svc.RegisterAccount("+992901000876")
-	payment, err := svc.Pay(5, 5_000_000, "fun")
-	payment, err = svc.Pay(7, 10_000_000, "auto")
+	payment, err := svc.Pay(1, 5_000_000, "fun")
+	payment, err = svc.Pay(1, 10_000_000, "auto")
 	//favorite, err := svc.FavoritePayment(payment.ID, "My Favorite Payment")
 	sum := svc.SumPayments(4)
 	//path := "files/accounts.txt"

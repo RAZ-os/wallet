@@ -578,8 +578,10 @@ func (s *Service) SumPayments(goroutines int) types.Money{
 
 		for i := 0; i < count; i++ {
 			go func(){
+				
 				defer wg.Done()
-				money := types.Money(0)			
+				money := types.Money(0)	
+
 				for _, payment := range s.payments {
 					money += payment.Amount
 				}

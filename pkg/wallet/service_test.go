@@ -30,7 +30,7 @@ var defaultTestAccount = testAccount {
 		amount types.Money
 		category types.PaymentCategory
 	}{
-		{amount: 2_000_00, category: "auto"},
+		{amount: 1_000_00, category: "auto"},
 	},
 }
 
