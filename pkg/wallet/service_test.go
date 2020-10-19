@@ -25,12 +25,12 @@ type testAccount struct {
 
 var defaultTestAccount = testAccount {
 	phone: "+992901000876",
-	balance: 10_000_00,
+	balance: 1_000_00,
 	payments: []struct {
 		amount types.Money
 		category types.PaymentCategory
 	}{
-		{amount: 1_000_00, category: "auto"},
+		{amount: 2_000_00, category: "auto"},
 	},
 }
 
@@ -344,11 +344,10 @@ func TestService_PayFromFavorite_success(t *testing.T) {
 	}
 }
 func TestService_SumPayments_success(t *testing.T) {
-	want := types.Money(3_000_00)
+	want := types.Money(2_000_00)
 	//создаём сервис
 	srv := newTestService()
 
-	//регистриуем там пользователя
 	_, _, _, err := srv.addAccount(defaultTestAccount)
 	if err != nil {
 		t.Error(err)

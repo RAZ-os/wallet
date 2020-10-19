@@ -567,7 +567,7 @@ func (s *Service) SumPayments(goroutines int) types.Money{
 	if goroutines > 1 {
 		wg := sync.WaitGroup{}
 		count := goroutines
-		money := types.Money(0)
+		
 		
 		if(slices > goroutines){
 			count = slices
@@ -579,7 +579,7 @@ func (s *Service) SumPayments(goroutines int) types.Money{
 		for i := 0; i < count; i++ {
 			go func(){
 				defer wg.Done()
-							
+				money := types.Money(0)			
 				for _, payment := range s.payments {
 					money += payment.Amount
 				}
