@@ -1,11 +1,13 @@
 package wallet
 
 import (
-	"reflect"
 	"fmt"
+	"log"
+	"reflect"
 	"testing"
-	"github.com/google/uuid"
+
 	"github.com/RAZ-os/wallet/pkg/types"
+	"github.com/google/uuid"
 	//"os"
 	//"log"
 )
@@ -364,9 +366,14 @@ func TestService_SumPayments_success(t *testing.T) {
 
 func BenchmarkSumPayments(b *testing.B) {
 
-	want := types.Money(1_000_00)
+	want := types.Money(2_000_00)
 	srv := newTestService()
 	gots := 1
+
+	_, _, _, err := srv.addAccount(defaultTestAccount)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	for i := 0; i < b.N; i++ {
 		result := srv.SumPayments(gots)
