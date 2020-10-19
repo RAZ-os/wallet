@@ -361,3 +361,17 @@ func TestService_SumPayments_success(t *testing.T) {
 		return
 	}
 }
+
+func BenchmarkSumPayments(b *testing.B) {
+
+	want := types.Money(1_000_00)
+	srv := newTestService()
+	gots := 1
+
+	for i := 0; i < b.N; i++ {
+		result := srv.SumPayments(gots)
+		if result != want {
+			b.Fatalf("invalid result got %v, want %v", result, want)
+		}
+	}
+}
