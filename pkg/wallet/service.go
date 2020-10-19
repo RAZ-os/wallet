@@ -4,13 +4,12 @@ import (
 	"bufio"
 	"errors"
 	"io"
-	//"io/ioutil"
+	"sync"
 	"log"
 	"os"
 	"strconv"
 	"strings"
 	"github.com/RAZ-os/wallet/pkg/types"
-	//"wallet/pkg/types"
 	"github.com/google/uuid"
 )
 
@@ -549,6 +548,57 @@ func (s *Service) Import(dir string) error {
 	}
 
 	return nil
+}
+
+/////////////////////////
+func (s *Service) SumPayments(goroutines int) types.Money{
+
+	sum := types.Money(0)
+	slices := len(s.payments)
+
+	if slices == 0 {
+		return 0
+	}
+
+	if slices == 1 {
+		return s.payments[0].Amount
+	}
+
+	if goroutines > 1 {
+		wg := sync.WaitGroup{}
+		count := goroutines
+		money := types.Money(0)
+		
+		if(slices > goroutines){
+			count = slices
+		}
+
+		wg.Add(count)
+		mutx := sync.Mutex{}
+
+		for i := 0; i < count; i++ {
+			go func(){
+				defer wg.Done()
+							
+				for _, payment := range s.payments {
+					money += payment.Amount
+				}
+
+				mutx.Lock()
+				defer mutx.Unlock()
+				sum += money
+			} ()
+		}
+		
+		return sum 
+	}
+
+	for _, payment := range s.payments {
+		sum += payment.Amount
+	}
+
+
+	return sum
 }
 
 /*func(s *Service) Import(dir string) error{

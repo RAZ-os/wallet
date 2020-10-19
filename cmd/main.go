@@ -5,14 +5,24 @@ import (
 	//"wallet/pkg/types"
 	//"strconv"
 	"github.com/RAZ-os/wallet/pkg/wallet"
+	//"github.com/RAZ-os/wallet/pkg/types"
 ) 
 
 func main(){
 
+	/*payments := []types.Payment{
+		{ID: 1, Category: "auto", Amount: 2_000_000},
+		{ID: 2, Category: "food", Amount: 2_000_000},
+		{ID: 3, Category: "auto", Amount: 3_000_000},
+		{ID: 4, Category: "auto", Amount: 4_000_000},
+		{ID: 5, Category: "fun",  Amount: 5_000_000},
+	}*/
+
 	 svc := &wallet.Service{}
 	account, err := svc.RegisterAccount("+992901000876")
-	payment, err := svc.Pay(account.ID, 20, "auto")
+	payment, err := svc.Pay(5, 5_000_000, "fun")
 	favorite, err := svc.FavoritePayment(payment.ID, "My Favorite Payment")
+	sum := svc.SumPayments(4)
 	//path := "files/accounts.txt"
 	dir := "files"
 	err = svc.Export(dir)
@@ -43,5 +53,6 @@ func main(){
 	fmt.Println(*account)
 	fmt.Println(payment)
 	fmt.Println(favorite)
+	fmt.Println(sum)
 	fmt.Println(err)
 }
