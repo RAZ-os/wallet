@@ -402,22 +402,15 @@ func TestService_SumPayments_fail(t *testing.T) {
 //////////////////////
 func TestService_SumPayments_success(t *testing.T) {
 	want := types.Money(2_000_00)
-	//создаём сервис
-	srv := newTestService()
+		//создаём сервис
+		s := newTestService()
 
-	_, _, _, err := srv.addAccount(defaultTestAccount)
-	if err != nil {
-		t.Error(err)
-		return
-	}
+		//регистриуем там пользователя
+		s.addAccount(defaultTestAccount)
 
-	got := srv.SumPayments(5)
+		got := s.SumPayments(1)
 
-	if want > got {
-		t.Errorf("SumPayments(): want: %v got: %v", want, got)
-		return
-	    }
-		if want < got {
+		if want != got {
 			t.Errorf("SumPayments(): want: %v got: %v", want, got)
 			return
 		}
