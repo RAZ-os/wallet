@@ -345,7 +345,7 @@ func TestService_PayFromFavorite_success(t *testing.T) {
 		return
 	}
 }
-/////////////////////
+////////////////////
 /*
 func TestService_SumPayments_fail(t *testing.T) {
 	want := types.Money(5_000_00)
@@ -360,12 +360,18 @@ func TestService_SumPayments_fail(t *testing.T) {
 
 	got := srv.SumPayments(2)
 
-	if want != got {
+	if want >= got {
+		t.Errorf("SumPayments(): want: %v got: %v", want, got)
+		return
+	}
+
+	if want >= got {
 		t.Errorf("SumPayments(): want: %v got: %v", want, got)
 		return
 	}
 }
-///////////////////////
+*/
+//////////////////////
 func TestService_SumPayments_success(t *testing.T) {
 	want := types.Money(2_000_00)
 	//создаём сервис
@@ -379,11 +385,15 @@ func TestService_SumPayments_success(t *testing.T) {
 
 	got := srv.SumPayments(5)
 
-	if want != got {
+	if want > got {
 		t.Errorf("SumPayments(): want: %v got: %v", want, got)
 		return
-	}
-}*/
+	    }
+		if want < got {
+			t.Errorf("SumPayments(): want: %v got: %v", want, got)
+			return
+		}
+}
 /////////////////////////
 func BenchmarkSumPayments(b *testing.B) {
 
@@ -402,4 +412,33 @@ func BenchmarkSumPayments(b *testing.B) {
 			b.Fatalf("invalid result got %v, want %v", result, want)
 		}
 	}
+}
+
+func TestService_Export_success(t *testing.T) {
+	srv := newTestService()
+
+	//регистриуем там пользователя
+	srv.addAccount(defaultTestAccount)
+
+	err := srv.Export("../../files")
+
+	if err != nil {
+		t.Errorf("Export(): error=%v", err)
+		return
+	}
+}
+
+func TestService_Import_success(t *testing.T) {
+//создаём сервис
+srv := newTestService()
+
+//регистриуем там пользователя
+srv.addAccount(defaultTestAccount)
+
+err := srv.Import("../../files")
+
+if err != nil {
+	t.Errorf("Import(): error=%v", err)
+	return
+}
 }
