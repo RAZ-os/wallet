@@ -346,6 +346,34 @@ func TestService_PayFromFavorite_success(t *testing.T) {
 	}
 }
 ////////////////////
+func TestService_Export_success(t *testing.T) {
+	srv := newTestService()
+
+	//регистриуем там пользователя
+	srv.addAccount(defaultTestAccount)
+
+	err := srv.Export("../../files")
+
+	if err != nil {
+		t.Errorf("Export(): error=%v", err)
+		return
+	}
+}
+
+func TestService_Import_success(t *testing.T) {
+//создаём сервис
+srv := newTestService()
+
+//регистриуем там пользователя
+srv.addAccount(defaultTestAccount)
+
+err := srv.Import("../../files")
+
+if err != nil {
+	t.Errorf("Import(): error=%v", err)
+	return
+}
+}
 /*
 func TestService_SumPayments_fail(t *testing.T) {
 	want := types.Money(5_000_00)
@@ -412,33 +440,4 @@ func BenchmarkSumPayments(b *testing.B) {
 			b.Fatalf("invalid result got %v, want %v", result, want)
 		}
 	}
-}
-
-func TestService_Export_success(t *testing.T) {
-	srv := newTestService()
-
-	//регистриуем там пользователя
-	srv.addAccount(defaultTestAccount)
-
-	err := srv.Export("../../files")
-
-	if err != nil {
-		t.Errorf("Export(): error=%v", err)
-		return
-	}
-}
-
-func TestService_Import_success(t *testing.T) {
-//создаём сервис
-srv := newTestService()
-
-//регистриуем там пользователя
-srv.addAccount(defaultTestAccount)
-
-err := srv.Import("../../files")
-
-if err != nil {
-	t.Errorf("Import(): error=%v", err)
-	return
-}
 }

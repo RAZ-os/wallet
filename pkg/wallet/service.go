@@ -554,7 +554,9 @@ func (s *Service) Import(dir string) error {
 func (s *Service) SumPayments(goroutines int) types.Money{
 
 	sum := types.Money(0)
-	slices := len(s.payments)
+	slices := (len(s.payments)/goroutines) + 1
+	mutx := sync.Mutex{}
+	wg := sync.WaitGroup{}
 
 	if slices == 0 {
 		return 0
@@ -562,45 +564,29 @@ func (s *Service) SumPayments(goroutines int) types.Money{
 
 	if slices == 1 {
 		return s.payments[0].Amount
-	}
-
-	if goroutines > 1 {
-		wg := sync.WaitGroup{}
-		count := goroutines
+	}	
 		
+		for i := 0; i < goroutines; i++ {
+			wg.Add(1)
+			money := types.Money(0)
 		
-		if(slices > goroutines){
-			count = slices
-		}
-
-		wg.Add(count)
-		mutx := sync.Mutex{}
-
-		for i := 0; i < count; i++ {
-			go func(){
-				
+			go func(val int) {
 				defer wg.Done()
-				money := types.Money(0)	
-
-				for _, payment := range s.payments {
-					money += payment.Amount
+				begin := val * slices
+				end := (val * slices) + slices
+				for j := begin; j < end; j++ {
+					if j > len(s.payments)-1 {
+						break
+					} 
+					money += s.payments[j].Amount
 				}
-
 				mutx.Lock()
 				defer mutx.Unlock()
 				sum += money
-			} ()
+			}(i)
 		}
-		
-		return sum 
-	}
-
-	for _, payment := range s.payments {
-		sum += payment.Amount
-	}
-
-
-	return sum
+		wg.Wait()
+		return sum
 }
 
 /*func(s *Service) Import(dir string) error{
