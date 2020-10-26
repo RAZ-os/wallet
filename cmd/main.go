@@ -18,16 +18,17 @@ func main(){
 		{ID: 5, Category: "fun",  Amount: 5_000_000},
 	}*/
 
-	 svc := &wallet.Service{}
+	svc := &wallet.Service{}
 	account, err := svc.RegisterAccount("+992901000876")
 	payment, err := svc.Pay(1, 5_000_000, "fun")
 	payment, err = svc.Pay(1, 10_000_000, "auto")
 	//favorite, err := svc.FavoritePayment(payment.ID, "My Favorite Payment")
-	sum := svc.SumPayments(1)
+	//sum := svc.SumPayments(1)
+	pro := svc.SumPaymentsWithProgress()
 	//path := "files/accounts.txt"
-	dir := "files"
-	err = svc.Export(dir)
-	err = svc.Import(dir)
+	//dir := "files"
+	//err = svc.Export(dir)
+	//err = svc.Import(dir)
 	//err = svc.ExportToFile(path)
 	//err = svc.ImportFromFile(path)
 	
@@ -54,6 +55,6 @@ func main(){
 	fmt.Println(*account)
 	fmt.Println(payment)
 	//fmt.Println(favorite)
-	fmt.Println(sum)
+	fmt.Println(pro)
 	fmt.Println(err)
 }

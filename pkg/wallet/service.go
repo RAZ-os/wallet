@@ -588,6 +588,60 @@ func (s *Service) SumPayments(goroutines int) types.Money{
 		wg.Wait()
 		return sum
 }
+////////////////////////////////////
+
+func (s *Service) SumPaymentsWithProgress() <-chan types.Progress {
+	pice := 100_0000
+
+	Money := make([]types.Money, 0)
+	for _, payment := range s.payments {
+		Money = append(Money, payment.Amount)
+	}
+
+	wg := sync.WaitGroup{}
+	goroutines := (len(Money) + 1) / pice
+	chnl := make(chan types.Progress)
+
+	if goroutines <= 0 {
+		goroutines = 1
+	}
+
+	for i := 0; i < goroutines; i++ {
+		wg.Add(1)
+		
+		go func(chnl chan<- types.Progress, Money []types.Money, part int) {
+			sum := 0
+			defer wg.Done()
+	
+	for _, val := range Money {
+				sum += int(val)
+	}
+			chnl <- types.Progress{
+				Result: types.Money(sum),
+			}
+			
+		}(chnl, Money, i)
+	}
+
+	go func() {
+		defer close(chnl)
+		wg.Wait()
+	}()
+
+	return chnl
+}
+
+/*func(s Service) SumPaymentsWithProgress() <- chan Progress{
+	 
+	payment := s.payments
+	total := make([]int, payment.
+	ch := make(chan int)
+
+	for i := range payment {
+		total[i] = i
+	}
+ return ch
+}*/
 
 /*func(s *Service) Import(dir string) error{
 
