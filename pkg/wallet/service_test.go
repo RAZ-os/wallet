@@ -27,12 +27,12 @@ type testAccount struct {
 
 var defaultTestAccount = testAccount {
 	phone: "+992901000876",
-	balance: 2_000_00,
+	balance: 4_000_00,
 	payments: []struct {
 		amount types.Money
 		category types.PaymentCategory
 	}{
-		{amount: 2_000_00, category: "auto"},
+		{amount: 4_000_00, category: "auto"},
 	},
 }
 
@@ -401,7 +401,7 @@ func TestService_SumPayments_fail(t *testing.T) {
 */
 //////////////////////
 func TestService_SumPayments_success(t *testing.T) {
-	want := types.Money(2_000_00)
+	want := types.Money(4_000_00)
 		//создаём сервис
 		s := newTestService()
 
@@ -418,7 +418,7 @@ func TestService_SumPayments_success(t *testing.T) {
 /////////////////////////
 func BenchmarkSumPayments(b *testing.B) {
 
-	want := types.Money(2_000_00)
+	want := types.Money(4_000_00)
 	srv := newTestService()
 	gots := 1
 
@@ -433,4 +433,17 @@ func BenchmarkSumPayments(b *testing.B) {
 			b.Fatalf("invalid result got %v, want %v", result, want)
 		}
 	}
+}
+/////////////////////////////////////////////////////////////////////////////
+func TestService_SumPaymentsWithProgress(t *testing.T) {
+	s := newTestService()
+	for i := 0; i < 4_000_00; i++ {
+		payment := &types.Payment{
+			ID:     uuid.New().String(),
+			Amount: types.Money(100),
+		}
+		s.payments = append(s.payments, payment)
+	}
+
+	s.SumPaymentsWithProgress()
 }
